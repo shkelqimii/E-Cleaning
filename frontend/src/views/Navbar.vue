@@ -1,51 +1,71 @@
 <template>
   <nav :class="isDarkMode ? 'bg-gradient-to-r from-violet-900 to-blue-900' : 'bg-gradient-to-r from-violet-300 to-blue-300'" class="shadow-lg transition-all duration-500 fixed bottom-0 w-full flex justify-center items-center p-1 mx-auto ">
-      
-      <!-- Center: Home Link -->
-      <router-link 
-          to="/index" 
-          :class="isDarkMode ? 'text-gray-700' : 'text-white'"
-          class="w-16 h-16 flex items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 shadow-md hover:shadow-lg rounded-full transform transition-all duration-200 hover:scale-110"
-      >
-          <font-awesome-icon icon="house" class="text-xl" />
-      </router-link>
 
-      <!-- Right: Options Button (positioned absolutely) -->
-      <button @click="showOptions = !showOptions" class="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 shadow-md hover:shadow-lg rounded-full transform transition-all duration-200 hover:scale-110 absolute right-4 bottom-2">
-          <font-awesome-icon icon="gear" class="text-xl text-white" />
-      </button>
+    <!-- Center: Home Link -->
+    <router-link 
+        to="/index" 
+        :class="isDarkMode ? 'text-gray-700' : 'text-white'"
+        class="w-16 h-16 flex items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 shadow-md hover:shadow-lg rounded-full transform transition-all duration-200 hover:scale-110"
+    >
+        <font-awesome-icon icon="house" class="text-xl" />
+    </router-link>
 
+    <!-- Right: Options Button (positioned absolutely) -->
+    <button ref="optionsButton" @click.stop="toggleOptions" class="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 shadow-md hover:shadow-lg rounded-full transform transition-all duration-200 hover:scale-110 absolute right-4 bottom-2">
+        <font-awesome-icon icon="gear" class="text-xl text-white" />
+    </button>
 
-      <!-- Dropdown with Logout and Dark Mode Toggle -->
-      <div v-if="showOptions" :class="isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'" class="absolute right-4 bottom-16 shadow-lg rounded-md p-2">
-          <button @click="toggleDarkMode" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
-              Dark Mode
-              <img v-if="isDarkMode" src="@/assets/moon.png" alt="Moon Icon" class="w-6 h-6" />
-              <img v-else src="@/assets/sun.png" alt="Sun Icon" class="w-6 h-6" />
-          </button>
-          <button @click="logout" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
-              Logout
-              <font-awesome-icon icon="right-from-bracket" />
-          </button>
-          <button @click="profile" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
-              profile
-              <font-awesome-icon icon="user" />
-          </button>
-          
-
-      </div>
+    <!-- Dropdown with Logout and Dark Mode Toggle -->
+    <div v-if="showOptions" ref="optionsDropdown" @click.stop :class="isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'" class="absolute right-4 bottom-16 shadow-lg rounded-md p-2">
+        <button @click="toggleDarkMode" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+            Dark Mode
+            <img v-if="isDarkMode" src="@/assets/moon.png" alt="Moon Icon" class="w-6 h-6" />
+            <img v-else src="@/assets/sun.png" alt="Sun Icon" class="w-6 h-6" />
+        </button>
+        <button @click="logout" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+            Logout
+            <font-awesome-icon icon="right-from-bracket" />
+        </button>
+        <button @click="profile" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+            profile
+            <font-awesome-icon icon="user" />
+        </button>
+        <button @click="workers" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+            Workers
+            <font-awesome-icon icon="users-gear" />
+        </button>
+    </div>
   </nav>
 </template>
 
-
-  
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { isDarkMode } from '@/state.js';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const showOptions = ref(false);  // New ref to track dropdown visibility
+const showOptions = ref(false);
+const optionsButton = ref(null);
+const optionsDropdown = ref(null);
+
+onMounted(() => {
+  document.addEventListener("click", outsideClickListener);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("click", outsideClickListener);
+});
+
+const outsideClickListener = (event) => {
+  if (optionsButton.value && !optionsButton.value.contains(event.target) && 
+      optionsDropdown.value && !optionsDropdown.value.contains(event.target)) {
+    showOptions.value = false;
+  }
+};
+
+const toggleOptions = () => {
+  showOptions.value = !showOptions.value;
+};
 
 const toggleDarkMode = () => {
     isDarkMode.value = !isDarkMode.value;
@@ -56,11 +76,16 @@ const logout = () => {
     localStorage.removeItem('loggedInUser');
     router.push('/');
 };
+
 const profile = () => {
   router.push({ name: 'Profile' }); // Assuming the route name for Profile.vue is 'Profile'
 };
 
+const workers = () => {
+  router.push({ name: 'Workers' }); // Assuming the route name for Profile.vue is 'Profile'
+};
 </script>
+
   
   <style>
   /* Animation for the icon transition */

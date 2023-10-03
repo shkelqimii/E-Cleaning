@@ -4,6 +4,7 @@ import Login from '../views/Login.vue'
 import Index from '../views/Index.vue'
 import Navbar from '../views/Navbar.vue'
 import Profile from '../views/Profile.vue'
+import Workers from '../views/Workers.vue'
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
     path: '/profile',
     name: 'Profile',
     component: Profile
+  },
+  {
+    path: '/workers',
+    name: 'Workers',
+    component: Workers
   }
 ];
 

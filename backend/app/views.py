@@ -4,6 +4,10 @@ from app.models import User
 from flask_login import login_user, logout_user, login_required
 from flask_login import current_user
 
+from flask import Flask, jsonify, request
+
+
+
 
 # metoda e regjistrimit te userit
 
@@ -91,5 +95,43 @@ def change_password():
         return jsonify(success=True, message="Password successfully updated!")
     else:
         return jsonify(success=False, message="Incorrect old password."), 401
+    
+
+@app.route('/api/workers', methods=['GET'])
+def get_workers():
+    # Assuming you have a role or similar field in your User model to differentiate workers.
+    workers = User.query.filter_by(role='worker').all()
+
+    # Convert the workers to a format that can be returned as JSON.
+    worker_list = [{'id': worker.id, 'username': worker.username} for worker in workers]
+    
+    return jsonify(worker_list)
 
 
+@app.route('/api/workers/<int:worker_id>', methods=['PUT'])
+def edit_worker(worker_id):
+    worker = User.query.get(worker_id)
+    if not worker:
+        return jsonify({"success": False, "message": "Worker not found"}), 404
+
+    data = request.get_json()
+    new_username = data.get('username')
+    if not new_username:
+        return jsonify({"success": False, "message": "Username is required"}), 400
+
+    worker.username = new_username
+    db.session.commit()
+
+    return jsonify({"success": True, "message": "Worker updated successfully"}), 200
+
+
+@app.route('/api/workers/<int:worker_id>', methods=['DELETE'])
+def delete_worker(worker_id):
+    worker = User.query.get(worker_id)
+    if not worker:
+        return jsonify({"success": False, "message": "Worker not found"}), 404
+
+    db.session.delete(worker)
+    db.session.commit()
+
+    return jsonify({"success": True, "message": "Worker deleted successfully"}), 200
