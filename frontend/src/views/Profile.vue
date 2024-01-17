@@ -7,7 +7,7 @@
     <div class="container mx-auto px-4 py-12">
       <!-- User Info -->
       <div v-if="user" class="bg-sky-100 dark:bg-gray-800 shadow-md rounded-lg p-6 mb-8">
-        <h1 class="text-xl font-semibold mb-4">Pour Profile</h1>
+        <h1 class="text-xl font-semibold mb-4">Your Profile</h1>
         <p><strong>Username:</strong> {{ user.username }}</p>
         <p><strong>Role:</strong> {{ user.role }}</p>
       </div>
@@ -33,8 +33,7 @@
             <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm New Password</label>
             <input v-model="confirmPassword" type="password" id="confirmPassword" class="mt-1 p-2 w-full border rounded-md dark:bg-gray-700 dark:text-white">
           </div>
-
-          <button type="submit" class="mr-4 px-32 py-3 text-white bg-gradient-to-r from-green-500 to-green-800 hover:from-yellow-800 hover:to-yellow-400 shadow-md hover:shadow-lg rounded-full transform transition-all duration-200 hover:scale-110">Submit</button>
+          <button type="submit" class=" px-24 py-4 text-white bg-gradient-to-r from-green-500 to-green-800 hover:from-yellow-800 hover:to-yellow-400 shadow-md hover:shadow-lg rounded-full transform transition-all duration-200 "><font-awesome-icon icon="floppy-disk" /> SaveChanges</button>
         </form>
       </div>
     </div>
@@ -87,8 +86,13 @@ const changePassword = async () => {
         alert('Error changing password.');
     }
 };
+
 </script>
 
 <style>
-/* Add your styles here */
+button[type="submit"] {
+    z-index: 1000; /* Setting a value lower than the dropdown's z-index */
+    position: relative; /* Ensuring it's positioned so z-index applies */
+}
+
 </style>

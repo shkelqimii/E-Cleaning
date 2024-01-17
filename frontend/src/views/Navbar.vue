@@ -1,55 +1,125 @@
 <template>
-  <nav :class="isDarkMode ? 'bg-gradient-to-r from-violet-900 to-blue-900' : 'bg-gradient-to-r from-violet-300 to-blue-300'" class="shadow-lg transition-all duration-500 fixed bottom-0 w-full flex justify-center items-center p-1 mx-auto ">
+  <nav :class="isDarkMode ? 'bg-gradient-to-r from-violet-900 to-blue-900' : 'bg-gradient-to-r from-violet-300 to-blue-300'" class="shadow-lg transition-all duration-500 fixed bottom-0 w-full flex justify-center items-center p-1 mx-auto nav-z-index">
+
+
+    <!-- Left: User Profile Button (positioned absolutely) -->
+
+    <router-link to="/cart" class=" flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full absolute left-4 bottom-2">
+        <font-awesome-icon icon="cart-shopping" class="text-xl text-white" />
+        <span v-if="totalCartItems > 0" class="absolute bottom-8 left-7 bg-red-500 text-white text-xm rounded-full w-7 h-7 flex items-center justify-center">{{ totalCartItems }}</span>
+    </router-link>
+
+
+    <router-link to="/products" class="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500  hover:shadow-lg rounded-full absolute left-20 bottom-2">
+        <font-awesome-icon icon="shop" class="text-xl text-white" />
+    </router-link>
+
 
     <!-- Center: Home Link -->
     <router-link 
         to="/index" 
         :class="isDarkMode ? 'text-gray-700' : 'text-white'"
-        class="w-16 h-16 flex items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 shadow-md hover:shadow-lg rounded-full transform transition-all duration-200 hover:scale-110"
+        class="w-20 h-16 flex items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"
     >
         <font-awesome-icon icon="house" class="text-xl" />
     </router-link>
 
+    <router-link to="/notifications/" class="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full absolute right-20 bottom-2">
+      <font-awesome-icon icon="newspaper" class="text-xl text-white" />
+    </router-link>
+    
+
+
+
     <!-- Right: Options Button (positioned absolutely) -->
-    <button ref="optionsButton" @click.stop="toggleOptions" class="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 shadow-md hover:shadow-lg rounded-full transform transition-all duration-200 hover:scale-110 absolute right-4 bottom-2">
+    <button ref="optionsButton" @click.stop="toggleOptions" class="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full absolute right-4 bottom-2">
         <font-awesome-icon icon="gear" class="text-xl text-white" />
     </button>
+    
 
     <!-- Dropdown with Logout and Dark Mode Toggle -->
-    <div v-if="showOptions" ref="optionsDropdown" @click.stop :class="isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'" class="absolute right-4 bottom-16 shadow-lg rounded-md p-2">
-        <button @click="toggleDarkMode" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+  <transition name="slide-fade">
+
+    <div v-if="showOptions" ref="optionsDropdown" @click.stop :class="isDarkMode ? ' bg-gray-900 text-white' : 'bg-white text-gray-900'" class="dropdown-size absolute right-4 bottom-16 shadow-lg rounded-md p-4">
+        <button @click="toggleDarkMode" class="w-full flex items-center justify-between p-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
             Dark Mode
             <img v-if="isDarkMode" src="@/assets/moon.png" alt="Moon Icon" class="w-6 h-6" />
             <img v-else src="@/assets/sun.png" alt="Sun Icon" class="w-6 h-6" />
         </button>
-        <button @click="logout" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+        <button @click="logout" class="w-full flex items-center justify-between p-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
             Logout
             <font-awesome-icon icon="right-from-bracket" />
         </button>
-        <button @click="profile" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
-            profile
+        <button @click="profile" class="w-full flex items-center justify-between p-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+            Profile
             <font-awesome-icon icon="user" />
         </button>
-        <button @click="workers" class="w-full flex items-center justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+        <button v-if="isAdmin" @click="workers" class="w-full flex items-center justify-between p-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
             Workers
             <font-awesome-icon icon="users-gear" />
         </button>
+        <button v-if="isAdminOrWorker" @click="clients" class="w-full flex items-center justify-between p-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+            Clients
+            <font-awesome-icon icon="handshake" />
+        </button>
+        <button v-if="isAdminOrWorker" @click="productForm" class="w-full flex items-center justify-between p-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+          Add product
+          <font-awesome-icon icon="plus" />
+        </button>
+        <button  @click="qrcodes" class="w-full flex items-center justify-between p-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+          QRCodes
+          <font-awesome-icon icon="qrcode" />
+        </button>
+
     </div>
+  </transition>
+  
+
+
   </nav>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted , computed} from 'vue';
 import { isDarkMode } from '@/state.js';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
+
 
 const router = useRouter();
 const showOptions = ref(false);
 const optionsButton = ref(null);
 const optionsDropdown = ref(null);
+const user = ref(null);  // Adding user ref
 
-onMounted(() => {
-  document.addEventListener("click", outsideClickListener);
+
+const cartItems = ref([]);  // This needs to be defined first
+
+onMounted(async () => {
+    try {
+        const userResponse = await axios.get('http://localhost:5000/user_details');
+        if (userResponse.data) {
+            user.value = userResponse.data;  // Set the user data
+        }
+
+
+        const response = await axios.get('http://localhost:5000/cart');
+        cartItems.value = response.data.cart_items;
+    } catch (error) {
+        console.error('Failed to fetch cart items:', error);
+    }
+});
+
+const isAdminOrWorker = computed(() => {
+  return user.value && (user.value.role === 'admin' || user.value.role === 'worker');
+});
+
+const isAdmin = computed(() => {
+  return user.value && (user.value.role === 'admin');
+});
+
+const totalCartItems = computed(() => {
+    return cartItems.value.reduce((acc, item) => acc + item.quantity, 0);
 });
 
 onUnmounted(() => {
@@ -72,10 +142,21 @@ const toggleDarkMode = () => {
     localStorage.setItem('dark-mode', isDarkMode.value);
 };
 
-const logout = () => {
-    localStorage.removeItem('loggedInUser');
-    router.push('/');
+const logout = async () => {
+    try {
+        const response = await axios.post('http://localhost:5000/logout');
+        if (response.data.success) {
+            // Handle successful logout
+            // For example, you can redirect to the login page or update the UI state to reflect that the user is logged out
+            router.push('/'); // Assuming you have a login route
+        } else {
+            console.error('Failed to logout:', response.data.message);
+        }
+    } catch (error) {
+        console.error('Error during logout:', error);
+    }
 };
+
 
 const profile = () => {
   router.push({ name: 'Profile' }); // Assuming the route name for Profile.vue is 'Profile'
@@ -84,6 +165,24 @@ const profile = () => {
 const workers = () => {
   router.push({ name: 'Workers' }); // Assuming the route name for Profile.vue is 'Profile'
 };
+
+const productForm = () => {
+  router.push({ name: 'ProductForm' }); 
+};
+
+const qrcodes = () => {
+  router.push({ name: 'QRCodes' }); 
+};
+
+
+
+
+
+const clients = () => {
+  router.push({ name: 'Clients' }); // Assuming the route name for Profile.vue is 'Profile'
+};
+
+
 </script>
 
   
@@ -112,6 +211,7 @@ const workers = () => {
   
   /* Navbar styles */
   nav {
+  position: relative;
   transition: all 0.5s;
   }
   /* Container to position the icons */
@@ -185,8 +285,27 @@ const workers = () => {
     margin-left: 10px;
     
   }
-  </style>
+.dropdown-size button {
+    font-size: 20px;  /* adjust this value to make the font size bigger or smaller */
+    padding: 15px 8px;  /* adjust these values to make the padding bigger or smaller */
+  }
+  /* Slide-fade transition styles */
+.slide-fade-enter-active, .slide-fade-leave-active {
+    transition: opacity 0.5s, transform 0.5s;
+}
+
+.slide-fade-enter, .slide-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-1em);
+}
+
+
+.nav-z-index {
+    z-index: 9998; /* Setting a value just below the dropdown's z-index */
+}
   
+
+  </style>
   
   
   

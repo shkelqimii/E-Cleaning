@@ -21,8 +21,8 @@
                   <label for="role" class="sr-only ">Role</label>
                   <select v-model="role" id="role" name="role" required class=" appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm">
                       <option value="client">Client</option>
-                      <option value="worker">Worker</option>
-                      <option value="admin">Admin</option>
+                      <option v-if="isAdmin" value="worker">Worker</option>
+                      <option v-if="isAdmin" value="admin">Admin</option>
                   </select>
               </div>
                 
@@ -39,7 +39,7 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
+  import { ref, onMounted, computed } from 'vue';
   import axios from 'axios';
   import { useRouter } from 'vue-router';
   import { isDarkMode } from '@/state.js';  // Import the isDarkMode state
@@ -49,6 +49,23 @@
   const password = ref('');
   const role = ref('admin');
   const router = useRouter();
+  const user = ref(null);  // Adding user ref
+
+
+  onMounted(async () => {
+    try {
+        const userResponse = await axios.get('http://localhost:5000/user_details');
+        if (userResponse.data) {
+            user.value = userResponse.data;  // Set the user data
+        }
+      } catch (error) {
+        console.error('Failed to fetch user:', error);
+    }
+});
+
+const isAdmin = computed(() => {
+  return user.value && (user.value.role === 'admin');
+});
   
   const register = async () => {
     try {

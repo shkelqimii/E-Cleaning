@@ -10,7 +10,7 @@ import axios from 'axios';
 
 // Font Awesome imports
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faUser, faCheck, faHouse , faUserPlus , faRightFromBracket , faTrashCanArrowUp, faPenToSquare , faArrowRight, faArrowLeft , faUsers, faUserSecret, faGear, faUsersGear} from '@fortawesome/free-solid-svg-icons';
+import { faUser, faCheck, faHouse , faUserPlus , faRightFromBracket , faTrashCanArrowUp, faPenToSquare , faArrowRight, faArrowLeft , faUsers, faUserSecret, faGear, faUsersGear, faHandshake, faCartShopping, faShop, faNewspaper, faPlus, faFloppyDisk, faMagnifyingGlass, faQrcode} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const app = createApp(App)
@@ -18,7 +18,7 @@ const app = createApp(App)
 axios.defaults.withCredentials = true;
 
 // Add Font Awesome icons to the library
-library.add(faUser, faCheck, faHouse ,faUserPlus, faRightFromBracket, faTrashCanArrowUp, faPenToSquare , faArrowRight, faArrowLeft, faUsers, faUserSecret, faGear, faUsersGear);
+library.add(faUser, faCheck, faHouse ,faUserPlus, faRightFromBracket, faTrashCanArrowUp, faPenToSquare , faArrowRight, faArrowLeft, faUsers, faUserSecret, faGear, faUsersGear, faHandshake, faCartShopping, faShop, faNewspaper, faPlus, faFloppyDisk, faMagnifyingGlass, faQrcode);
 
 // Register the Font Awesome component globally
 app.component('font-awesome-icon', FontAwesomeIcon);
